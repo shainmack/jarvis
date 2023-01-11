@@ -2,32 +2,35 @@ import os
 import openai as ai
 import speech_recognition as sr
 from boto3 import Session
-from botocore.exceptions import BotoCoreError, ClientError
+# from botocore.exceptions import BotoCoreError, ClientError
 from pydub import AudioSegment
 from pydub.playback import play
-import pyaudio
-import sys
-import subprocess
-from tempfile import gettempdir
-from contextlib import closing
+
+# import pyaudio
+# import sys
+# import subprocess
+# from tempfile import gettempdir
+# from contextlib import closing
 
 ai.organization = 'org-YB5CGIuUYASqH4kd334vMaum'
 ai.api_key = os.environ.get('OPENAI_API_KEY')
 wake_word = 'hey jarvis'
 
+
 def query_ai(prompt):
     print('Prompt received: ', prompt)
     completions = ai.Completion.create(
-        engine = 'text-davinci-003',
-        prompt = prompt,
-        max_tokens = 128,
-        n = 1,
-        stop = None,
-        temperature = 0.5
+        engine='text-davinci-003',
+        prompt=prompt,
+        max_tokens=128,
+        n=1,
+        stop=None,
+        temperature=0.5
     )
     message = completions.choices[0].text
     print('Message: ', message)
     return message
+
 
 def listen_for_wake_word():
     r = sr.Recognizer()
@@ -55,10 +58,11 @@ def listen_for_wake_word():
             print('WaitTimeoutError: You took too long to speak.')
     return
 
+
 def speak(content):
     session = Session(
-        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY'),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
         region_name='us-east-1'
     )
     polly = session.client('polly')
@@ -77,7 +81,7 @@ def speak(content):
     play(clip)
 
 
-if __name__  == "__main__" :
+if __name__ == "__main__":
     # query_ai('how are you?')
     while True:
         listen_for_wake_word()
